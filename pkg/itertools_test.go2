@@ -1,0 +1,67 @@
+package pkg
+
+import (
+	"testing"
+)
+
+func TestRepeat(t *testing.T) {
+	t.Run("should repeat an int 5 times", func(t *testing.T) {
+		cnt := 0
+
+		for num := range Repeat(15, 5) {
+			if num != 15 {
+				t.Errorf("the num is %d instead of 15", num)
+			}
+			cnt++
+		}
+		if cnt != 5 {
+			t.Errorf("the cnt is %d instead of 5", cnt)
+		}
+	})
+
+	t.Run("should repeat a slice of ints 5 times", func(t *testing.T) {
+		cnt := 0
+		slc := []int{10, 20, 30, 40, 50}
+		for fetchedSlc := range Repeat(slc, 5) {
+			if !equalSlice(fetchedSlc, slc) {
+				t.Errorf("the slc is %v instead of %v", fetchedSlc, slc)
+			}
+			cnt++
+		}
+		if cnt != 5 {
+			t.Errorf("the cnt is %d instead of 5", cnt)
+		}
+	})
+}
+
+func TestCombinations(t *testing.T) {
+	t.Run("combinations of 2 elements from slice of 3 ints", func(t *testing.T) {
+		exp := [][]int{
+			{1, 2},
+			{1, 3},
+			{2, 3},
+		}
+		i := 0
+		for comb := range Combinations([]int{1, 2, 3}, 2) {
+			if !equalSlice(comb, exp[i]) {
+				t.Errorf("%v is not the expected %v", comb, exp[i])
+			}
+			i++
+		}
+	})
+
+	t.Run("combinations of 2 elements from slice of 3 strings", func(t *testing.T) {
+		exp := [][]string{
+			{"xyz", "qwe"},
+			{"xyz", "rty"},
+			{"qwe", "rty"},
+		}
+		i := 0
+		for comb := range Combinations([]string{"xyz", "qwe", "rty"}, 2) {
+			if !equalSlice(comb, exp[i]) {
+				t.Errorf("%v is not the expected %v", comb, exp[i])
+			}
+			i++
+		}
+	})
+}

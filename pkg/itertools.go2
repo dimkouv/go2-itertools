@@ -1,0 +1,75 @@
+package pkg
+
+import (
+	"fmt"
+	"math/bits"
+)
+
+// Repeat repeats the provided element 'n' times.
+func Repeat[T any](element T, n int) chan T {
+	ch := make(chan T)
+
+	if n <= 0 {
+		go func() {
+			for {
+				ch <- element
+			}
+		}()
+	}
+
+	go func() {
+		for i := 0; i < n; i++ {
+			ch <- element
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func ExampleRepeat() {
+	for c := range Repeat("x", 3) {
+		fmt.Printf(c)
+	}
+	// Output: xxx
+}
+
+// Combinations returns all the combinations by n elements from the provided list.
+func Combinations[T any](list []T, n int) chan []T {
+	ch := make(chan []T)
+
+	go func() {
+		length := uint(len(list))
+
+		if n > len(list) {
+			n = len(list)
+		}
+
+		for subsetBits := 1; subsetBits < (1 << length); subsetBits++ {
+			if n > 0 && bits.OnesCount(uint(subsetBits)) != n {
+				continue
+			}
+
+			var subset []T
+
+			for object := uint(0); object < length; object++ {
+				if (subsetBits>>object)&1 == 1 {
+					subset = append(subset, list[object])
+				}
+			}
+
+			ch <-subset
+		}
+
+		close(ch)
+	}()
+
+	return ch
+}
+
+func ExampleCombinations() {
+	for c := range Combinations([]int{1,2,3}, 2) {
+		fmt.Printf("%v", c)
+	}
+	// Output: [1 2][1 3][2 3]
+}
